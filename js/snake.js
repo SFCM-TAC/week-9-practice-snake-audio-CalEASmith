@@ -14,6 +14,38 @@ var xFruit = 0;
 var yFruit = 0;
 var scoreElem;
 
+var speed = 15;
+
+var synth = new Tone.Synth(
+{
+  envelope: {
+    attack: 0.1,
+    decay: 1.1,
+    sustain: 1,
+    release: 1
+  }
+}).toMaster();
+
+var ding = new Tone.Synth(
+{
+  envelope: {
+    attack: 0,
+    decay: 0.1,
+    sustain: 0.3,
+    release: 1
+  }
+}).toMaster();
+
+var noteValue = ["C", "D", "E", "F", "G", "A", "B"];
+
+//Background noise
+function ostinato(){
+  var pickNote = Math.floor(Math.random() * 8);
+  var randomNote = noteValue[pickNote];
+  synth.triggerAttackRelease(randomNote + '4','8n');
+}
+var repeater = setInterval(ostinato, 1000);
+
 function setup() {
   scoreElem = createDiv('Score = 0');
   scoreElem.position(20, 20);
@@ -21,7 +53,7 @@ function setup() {
   scoreElem.style('color', 'white');
 
   createCanvas(500, 500);
-  frameRate(15);
+  frameRate(speed);
   stroke(255);
   strokeWeight(10);
   updateFruitCoordinates();
@@ -93,6 +125,9 @@ function checkGameStatus() {
     noLoop();
     var scoreVal = parseInt(scoreElem.html().substring(8));
     scoreElem.html('Game ended! Your score was : ' + scoreVal);
+    //Loss noise
+    clearInterval(repeater);
+    synth.triggerAttackRelease('F#3','8n');
   }
 }
 
@@ -124,6 +159,10 @@ function checkForFruit() {
     yCor.unshift(yCor[0]);
     numSegments++;
     updateFruitCoordinates();
+    ding.triggerAttackRelease('C6','8n');
+    //Point gain ding
+    speed = speed + 5;
+    frameRate(speed);
   }
 }
 
